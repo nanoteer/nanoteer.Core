@@ -24,6 +24,8 @@ namespace Nanoteer.Core
         /// Index 0 is unused.
         /// </summary>
         public int[] SocketPins { get; private set; }
+        public int[] AnalogChannels { get; private set; }
+        public string SerialPortName { get; set; }
 
         /// <summary>
         /// The supported types of this socket.  
@@ -57,17 +59,24 @@ namespace Nanoteer.Core
             Name = socketNumber.ToString();
             SocketNumber = socketNumber;
             SupportedTypes = socketTypes;
-            SocketPins = new int[11]{ UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin,
-                                        UnspecifiedPin };
+            AnalogChannels = new int[3] {
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin
+            };
+            SocketPins = new int[11]{
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin,
+                                    UnspecifiedPin
+            };
         }
 
         public static bool TryRegisterSocket(Socket socket)
