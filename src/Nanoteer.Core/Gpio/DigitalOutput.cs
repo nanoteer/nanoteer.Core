@@ -32,7 +32,7 @@ namespace Nanoteer.Core.Gpio
 
         public void Dispose()
         {
-            _port.Dispose();
+            _port?.Dispose();
         }
     }
 }
