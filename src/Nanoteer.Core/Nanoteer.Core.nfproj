@@ -22,6 +22,7 @@
     <Compile Include="Exceptions\SocketImmutableAfterRegistrationException.cs" />
     <Compile Include="Gpio\AnalogInput.cs" />
     <Compile Include="Gpio\DigitalOutput.cs" />
+    <Compile Include="Gpio\InterruptInput.cs" />
     <Compile Include="IMainboard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serial\SerialSocket.cs" />

@@ -1,6 +1,4 @@
 ﻿using Nanoteer.Core.Exceptions;
-using System;
-using System.Threading;
 using Windows.Devices.SerialCommunication;
 using Windows.Storage.Streams;
 
