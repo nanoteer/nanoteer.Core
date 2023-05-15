@@ -1,6 +1,6 @@
 ﻿using Nanoteer.Core.Exceptions;
 using System;
-using Windows.Devices.Gpio;
+using System.Device.Gpio;
 
 namespace Nanoteer.Core.Gpio
 {
@@ -8,8 +8,8 @@ namespace Nanoteer.Core.Gpio
 
     public class InterruptInput : IDisposable
     {
-        private object objLock = new object();
-        private GpioPin _port;
+        private readonly object objLock = new();
+        private readonly GpioPin _port;
         private InterruptEventHandler interruptEvent;
         public event InterruptEventHandler Interrupt
         {
@@ -37,21 +37,21 @@ namespace Nanoteer.Core.Gpio
                 throw new InvalidSocketException(socket, "DigitalOutput");
             }
 
-            _port = GpioController.GetDefault().OpenPin(cpuPin);
-            _port.DebounceTimeout = new TimeSpan(0, 0, 0, 0, 10);
-            _port.SetDriveMode(GpioPinDriveMode.InputPullDown);
+            GpioController gpioController = new();
+            _port = gpioController.OpenPin(cpuPin, PinMode.Input);
+            //_port.DebounceTimeout = new TimeSpan(0, 0, 0, 0, 10);
             _port.ValueChanged += ValueChanged;
         }
 
         public bool Read()
         {
-            GpioPinValue pinValue = _port.Read();
-            return pinValue == GpioPinValue.High ? true : false;
+            PinValue pinValue = _port.Read();
+            return pinValue == PinValue.High;
         }
 
-        private void ValueChanged(object sender, GpioPinValueChangedEventArgs e)
+        private void ValueChanged(object sender, PinValueChangedEventArgs e)
         {
-            interruptEvent?.Invoke(this, e.Edge == GpioPinEdge.RisingEdge);
+            interruptEvent?.Invoke(this, e.ChangeType == PinEventTypes.Rising);
         }
 
         public void Dispose()

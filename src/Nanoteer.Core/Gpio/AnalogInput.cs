@@ -1,12 +1,12 @@
 ﻿using Nanoteer.Core.Exceptions;
 using System;
-using Windows.Devices.Adc;
+using System.Device.Adc;
 
 namespace Nanoteer.Core.Gpio
 {
     public class AnalogInput : IDisposable
     {
-        private AdcChannel _channel;
+        private readonly AdcChannel _channel;
 
         public AnalogInput(Socket socket, int analogChannel)
         {
@@ -16,7 +16,8 @@ namespace Nanoteer.Core.Gpio
                 throw new InvalidSocketException(socket, "DigitalOutput");
             }
 
-            _channel = AdcController.GetDefault().OpenChannel(analogChannel);
+            AdcController adcController = new();
+            _channel = adcController.OpenChannel(analogChannel);
         }
 
         public int Read()

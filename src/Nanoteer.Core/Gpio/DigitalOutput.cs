@@ -1,12 +1,12 @@
 ﻿using Nanoteer.Core.Exceptions;
 using System;
-using Windows.Devices.Gpio;
+using System.Device.Gpio;
 
 namespace Nanoteer.Core.Gpio
 {
     public class DigitalOutput : IDisposable
     {
-        private GpioPin _port;
+        private readonly GpioPin _port;
 
         public DigitalOutput(Socket socket, int cpuPin)
         {
@@ -16,16 +16,16 @@ namespace Nanoteer.Core.Gpio
                 throw new InvalidSocketException(socket, "DigitalOutput");
             }
 
-            _port = GpioController.GetDefault().OpenPin(cpuPin);
-            _port.SetDriveMode(GpioPinDriveMode.Output);
+            GpioController gpioController = new();
+            _port = gpioController.OpenPin(cpuPin, PinMode.Output);
         }
 
         public void Write(bool state)
         {
-            _port.Write(state ? GpioPinValue.High : GpioPinValue.Low);
+            _port.Write(state ? PinValue.High : PinValue.Low);
         }
 
-        public GpioPinValue Read()
+        public PinValue Read()
         {
             return _port.Read();
         }

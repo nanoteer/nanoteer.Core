@@ -1,6 +1,5 @@
 ﻿using Nanoteer.Core.Exceptions;
-using Windows.Devices.SerialCommunication;
-using Windows.Storage.Streams;
+using System.IO.Ports;
 
 namespace Nanoteer.Core.Serial
 {
@@ -8,9 +7,9 @@ namespace Nanoteer.Core.Serial
 
     public class SerialSocket
     {
-        private object objLock = new object();
-        private SerialDevice _serialDevice;
-        private bool watchCharEnabled = false;
+        private readonly object objLock = new();
+        private readonly SerialPort _serialPort;
+        private readonly bool watchCharEnabled = false;
 
         private SerialBytesReadEventHandler serialbytesReadEvent;
         public event SerialBytesReadEventHandler SerialBytesRead
@@ -40,20 +39,21 @@ namespace Nanoteer.Core.Serial
                 throw new InvalidSocketException(socket, "SerialSocket");
             }
 
-            _serialDevice = SerialDevice.FromId(socket.SerialPortName);
-
-            _serialDevice.BaudRate = 9600;
-            _serialDevice.Parity = SerialParity.None;
-            _serialDevice.StopBits = SerialStopBitCount.Two;
-            _serialDevice.Handshake = SerialHandshake.None;
-            _serialDevice.DataBits = 8;
+            _serialPort = new SerialPort(socket.SerialPortName)
+            {
+                BaudRate = 9600,
+                Parity = Parity.None,
+                StopBits = StopBits.Two,
+                Handshake = Handshake.None,
+                DataBits = 8
+            };
 
             if (watchChar != 0)
             {
-                _serialDevice.WatchChar = watchChar;
+                _serialPort.WatchChar = watchChar;
                 watchCharEnabled = true;
             }
-            _serialDevice.DataReceived += SerialDevice_DataReceived;
+            _serialPort.DataReceived += SerialDevice_DataReceived;
         }
 
         private void SerialDevice_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -62,19 +62,15 @@ namespace Nanoteer.Core.Serial
             {
                 return;
             }
-            using (DataReader inputDataReader = new DataReader(_serialDevice.InputStream))
+
+            // read all available bytes from the Serial Device input stream
+            var bytesRead = _serialPort.BytesToRead;
+
+            if (bytesRead > 0)
             {
-                inputDataReader.InputStreamOptions = InputStreamOptions.Partial;
-
-                // read all available bytes from the Serial Device input stream
-                var bytesRead = inputDataReader.Load(_serialDevice.BytesToRead);
-
-                if (bytesRead > 0)
-                {
-                    byte[] array = new byte[bytesRead];
-                    inputDataReader.ReadBytes(array);
-                    serialbytesReadEvent?.Invoke(this, array);
-                }
+                byte[] array = new byte[bytesRead];
+                _serialPort.Read(array, 0, bytesRead);
+                serialbytesReadEvent?.Invoke(this, array);
             }
         }
     }
